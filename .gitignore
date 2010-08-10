@@ -1,0 +1,10 @@
+build/
+bin/
+obj/
+
+*.user
+_ReSharper*
+*.resharper*
+*.suo
+*.sln.cache
+*.gpState

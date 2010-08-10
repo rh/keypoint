@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<project name="nant" default="test" xmlns="http://nant.sf.net/schemas/nant.xsd">
+
+  <property name="configuration"    value="Release"/>
+  <property name="base.dir"         value="${directory::get-current-directory()}"/>
+  <property name="build.base.dir"   value="${path::combine(base.dir, 'build')}"/>
+  <property name="build.dir"        value="${path::combine(build.base.dir, configuration)}"/>
+
+  <target name="compile">
+  	<delete dir="${build.base.dir}" if="${directory::exists(property::get-value('build.base.dir'))}"/>
+  	<mkdir dir="${build.dir}" failonerror="false"/>
+    <copy file="lib/nunit.framework.dll" tofile="${build.dir}/nunit.framework.dll" />
+    <copy file="lib/itextsharp.dll" tofile="${build.dir}/itextsharp.dll" />
+    <csc target="exe" warnaserror="true" debug="false" output="${build.dir}/keypoint.exe">
+      <sources>
+        <include name="src/KeyPoint/**/*.cs" />
+      </sources>
+      <references>
+        <include name="${build.dir}/itextsharp.dll" />
+      </references>
+    </csc>
+    <csc target="library" warnaserror="true" debug="false" output="${build.dir}/KeyPoint.Tests.dll">
+      <sources>
+        <include name="src/KeyPoint.Tests/**/*.cs" />
+      </sources>
+      <references>
+        <include name="${build.dir}/keypoint.exe" />
+        <include name="${build.dir}/nunit.framework.dll" />
+      </references>
+    </csc>
+  </target>
+
+  <target name="test" depends="compile">
+    <exec program="tools/nunit/nunit-console.exe">
+      <arg value="${build.dir}/KeyPoint.Tests.dll" />
+      <arg value="/xml=${build.dir}/tests.xml" />
+    </exec>
+  </target>
+
+</project>
